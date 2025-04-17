@@ -70,7 +70,7 @@ if [ $stage -le 0 ]; then
     ### Task dependent. You have to make data the following preparation part by yourself.
     ### But you can utilize Kaldi recipes in most cases
     # Generate wav.scp, text, utt2spk, spk2utt (segments)
-    local/aishell_data_prep.sh $data/data_aishell/wav $data/data_aishell/transcript || exit 1;
+    local/aishell_data_prep.sh $data/wav $data/transcript || exit 1;
     # remove space in text
     for x in train test dev; do
         cp data/${x}/text data/${x}/text.org
