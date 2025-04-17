@@ -60,7 +60,7 @@ decode_max_len=100
 
 # exp tag
 tag="" # tag for managing experiments.
-
+outputdir=exp
 . utils/parse_options.sh || exit 1;
 . ./cmd.sh
 . ./path.sh
@@ -89,7 +89,7 @@ if [ $stage -le 1 ]; then
     fbankdir=fbank
     for data in train test dev; do
         steps/make_fbank.sh --cmd "$train_cmd" --nj $nj --write_utt2num_frames true \
-            data/$data exp/make_fbank/$data $fbankdir/$data || exit 1;
+            data/$data ${outputdir}/make_fbank/$data $fbankdir/$data || exit 1;
     done
     # compute global CMVN
     compute-cmvn-stats scp:data/train/feats.scp data/train/cmvn.ark
@@ -97,7 +97,7 @@ if [ $stage -le 1 ]; then
     for data in train test dev; do
         feat_dir=`eval echo '$feat_'${data}'_dir'`
         dump.sh --cmd "$train_cmd" --nj $nj --do_delta $do_delta \
-            data/$data/feats.scp data/train/cmvn.ark exp/dump_feats/$data $feat_dir
+            data/$data/feats.scp data/train/cmvn.ark ${outputdir}/dump_feats/$data $feat_dir
     done
 fi
 
@@ -131,12 +131,12 @@ if [ $stage -le 2 ]; then
 fi
 
 if [ -z ${tag} ]; then
-    expdir=exp/train_m${LFR_m}_n${LFR_n}_in${d_input}_elayer${n_layers_enc}_head${n_head}_k${d_k}_v${d_v}_model${d_model}_inner${d_inner}_drop${dropout}_pe${pe_maxlen}_emb${d_word_vec}_dlayer${n_layers_dec}_share${tgt_emb_prj_weight_sharing}_ls${label_smoothing}_epoch${epochs}_shuffle${shuffle}_bs${batch_size}_bf${batch_frames}_mli${maxlen_in}_mlo${maxlen_out}_k${k}_warm${warmup_steps}
+    expdir=${outputdir}/train_m${LFR_m}_n${LFR_n}_in${d_input}_elayer${n_layers_enc}_head${n_head}_k${d_k}_v${d_v}_model${d_model}_inner${d_inner}_drop${dropout}_pe${pe_maxlen}_emb${d_word_vec}_dlayer${n_layers_dec}_share${tgt_emb_prj_weight_sharing}_ls${label_smoothing}_epoch${epochs}_shuffle${shuffle}_bs${batch_size}_bf${batch_frames}_mli${maxlen_in}_mlo${maxlen_out}_k${k}_warm${warmup_steps}
     if ${do_delta}; then
         expdir=${expdir}_delta
     fi
 else
-    expdir=exp/train_${tag}
+    expdir=${outputdir}/train_${tag}
 fi
 mkdir -p ${expdir}
 
